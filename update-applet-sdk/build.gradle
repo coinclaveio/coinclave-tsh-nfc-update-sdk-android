@@ -1,0 +1,70 @@
+plugins {
+    id 'com.android.library'
+    id 'org.jetbrains.kotlin.android'
+}
+
+android {
+    namespace 'io.coinclave.crypto.applet.update'
+    compileSdk 34
+
+    defaultConfig {
+        minSdk 26
+        targetSdk 34
+        versionCode 1
+        versionName "0.1.0"
+
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+
+        buildConfigField "String", "DATA_SERVICE_URL", "\"https://gateway.coinclave.io\""
+        buildConfigField "String", "AUTH_SERVICE_URL", "\"https://auth.coinclave.io\""
+        buildConfigField "String", "AUTH_LOGIN", "\"abcorp-api-client\""
+        buildConfigField "String", "AUTH_PASSWORD", "\"5Yo0QH4pNxH8qF11S2aTrlb9mWG6M8rh\""
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+    }
+    kotlinOptions {
+        jvmTarget = '17'
+    }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
+    }
+
+    libraryVariants.all { variant ->
+        variant.outputs.all { output ->
+            if (outputFile != null && outputFileName.endsWith('.aar')) {
+                outputFileName = "${archivesBaseName}-${defaultConfig.versionName}.aar"
+            }
+        }
+    }
+}
+
+dependencies {
+    implementation 'androidx.appcompat:appcompat:1.7.0'
+    implementation 'androidx.activity:activity-ktx:1.9.0'
+    implementation 'androidx.cardview:cardview:1.0.0'
+    implementation 'androidx.lifecycle:lifecycle-extensions:2.2.0'
+    implementation 'com.google.android.material:material:1.12.0'
+    implementation 'org.apache.commons:commons-lang3:3.12.0'
+
+    implementation('com.squareup.retrofit2:retrofit:2.9.0') {
+        exclude module: 'okhttp'
+    }
+    implementation 'com.google.code.gson:gson:2.10.1'
+    implementation 'io.gsonfire:gson-fire:1.8.5'
+    implementation 'com.squareup.retrofit2:converter-gson:2.5.0'
+    implementation 'com.squareup.okhttp3:logging-interceptor:4.11.0'
+    implementation 'com.squareup.okhttp3:okhttp:4.11.0'
+
+    implementation "io.reactivex.rxjava2:rxjava:2.1.8"
+    implementation "io.reactivex.rxjava2:rxandroid:2.0.1"
+
+    testImplementation 'junit:junit:4.13.2'
+    androidTestImplementation 'androidx.test.ext:junit:1.2.1'
+    androidTestImplementation 'androidx.test.espresso:espresso-core:3.6.1'
+}
