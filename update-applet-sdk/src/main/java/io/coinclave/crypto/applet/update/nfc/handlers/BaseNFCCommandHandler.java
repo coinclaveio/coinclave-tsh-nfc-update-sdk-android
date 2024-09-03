@@ -37,7 +37,7 @@ public abstract class BaseNFCCommandHandler<I extends AbstractNFCCommand> implem
 
                 if (isDynamicAction) {
                     if (needGetAdditionalCommands(action)) {
-                        var additionalCommands = getAdditionalCommands(action);
+                        var additionalCommands = getAdditionalCommands(command, action);
                         while(additionalCommands != null && !additionalCommands.isEmpty()) {
                             for (var request : action.getRequests()) {
                                 ResponseApdu intermediateResult = listener.send(request);

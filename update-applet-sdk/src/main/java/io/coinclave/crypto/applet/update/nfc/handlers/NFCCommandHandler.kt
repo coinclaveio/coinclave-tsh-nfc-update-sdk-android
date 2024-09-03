@@ -2,6 +2,7 @@ package io.coinclave.crypto.applet.update.nfc.handlers
 
 import io.coinclave.crypto.applet.update.nfc.commands.AbstractNFCCommand
 import io.coinclave.crypto.applet.update.nfc.commands.BaseNFCExchangeAction
+import io.coinclave.crypto.applet.update.nfc.commands.CheckAppletVersionCommand
 import io.coinclave.crypto.applet.update.nfc.iso7816.CommandApdu
 
 interface NFCCommandHandler<I : AbstractNFCCommand> {
@@ -14,6 +15,6 @@ interface NFCCommandHandler<I : AbstractNFCCommand> {
 
     fun needGetAdditionalCommands(action: BaseNFCExchangeAction): Boolean
 
-    fun getAdditionalCommands(action: BaseNFCExchangeAction): List<BaseNFCExchangeAction>?
+    fun getAdditionalCommands(command: I, action: BaseNFCExchangeAction): List<CommandApdu>?
 
 }

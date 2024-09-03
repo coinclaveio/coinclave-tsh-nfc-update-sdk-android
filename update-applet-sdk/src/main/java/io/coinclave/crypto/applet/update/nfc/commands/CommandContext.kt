@@ -10,6 +10,7 @@ class CommandContext: Serializable {
     private val requests = ArrayList<CommandApdu>()
     private val abstractValues = HashMap<String, Any>()
     private var currentStepIndex = 0
+    var result: Any? = null
 
     fun getValueFromStep(command: CommandApdu): ResponseApdu? {
         return values[command]

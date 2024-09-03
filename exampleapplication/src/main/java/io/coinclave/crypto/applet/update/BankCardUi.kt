@@ -37,32 +37,12 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
-// Defining the LatoFont
-val LatoFont = FontFamily(
-    Font(R.font.lato_black, FontWeight.Black),
-    Font(R.font.lato_black_italic, FontWeight.Black, FontStyle.Italic),
-    Font(R.font.lato_bold, FontWeight.Bold),
-    Font(R.font.lato_bold_italic, FontWeight.Bold, FontStyle.Italic),
-    Font(R.font.lato_italic, FontWeight.Normal, FontStyle.Italic),
-    Font(R.font.lato_light, FontWeight.Light),
-    Font(R.font.lato_light_italic, FontWeight.Light, FontStyle.Italic),
-    Font(R.font.lato_regular, FontWeight.Normal),
-    Font(R.font.lato_thin, FontWeight.Thin),
-    Font(R.font.lato_thin_italic, FontWeight.Thin, FontStyle.Italic)
-)
-
 // Our star of the show: BankCardUi
 @Composable
 fun BankCardUi(
     // Designing Flexible Composables
     modifier: Modifier = Modifier, // Modifier as Parameter
     baseColor: Color = Color(0xFF1252C8),
-    cardNumber: String = "",
-    cardHolder: String = "",
-    expires: String = "",
-    cvv: String = "",
-    brand: String = "",
-    maskNumber: Boolean = true
 ) {
     // Bank Card Aspect Ratio
     val bankCardAspectRatio = 1.586f // (e.g., width:height = 85.60mm:53.98mm)
@@ -80,49 +60,6 @@ fun BankCardUi(
                 painter = painterResource(id = R.drawable.card_background),
                 contentDescription = "bankCard")
 //            BankCardBackground(baseColor = baseColor)
-            BankCardNumber(cardNumber = cardNumber, maskNumber = maskNumber)
-            // Positioned to corner top left
-            SpaceWrapper(
-                modifier = Modifier.align(Alignment.TopStart),
-                space = 32.dp,
-                top = true,
-                left = true
-            ) {
-                BankCardLabelAndText(label = "card holder", text = cardHolder)
-            }
-            // Positioned to corner bottom left
-            SpaceWrapper(
-                modifier = Modifier.align(Alignment.BottomEnd)
-                    .padding(end = 20.dp),
-                space = 32.dp,
-                bottom = true,
-                left = true
-            ) {
-                Row {
-                    BankCardLabelAndText(label = "expires", text = expires)
-                    Spacer(modifier = Modifier.width(16.dp))
-                    BankCardLabelAndText(label = "cvv", text = cvv)
-                }
-            }
-            // Positioned to corner bottom right
-            SpaceWrapper(
-                modifier = Modifier.align(Alignment.BottomEnd),
-                space = 32.dp,
-                bottom = true,
-                right = true
-            ) {
-                // Feel free to use an image instead
-                Text(
-                    text = brand, style = TextStyle(
-                        fontFamily = LatoFont,
-                        fontWeight = FontWeight.W500,
-                        fontStyle = FontStyle.Italic,
-                        fontSize = 22.sp,
-                        letterSpacing = 1.sp,
-                        color = Color.White
-                    )
-                )
-            }
         }
     }
 }
@@ -152,140 +89,6 @@ fun BankCardBackground(baseColor: Color) {
     }
 }
 
-@Composable
-fun BankCardNumber(cardNumber: String, maskNumber: Boolean) {
-    Row(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(horizontal = 32.dp),
-        horizontalArrangement = Arrangement.SpaceBetween, // Space out the children evenly
-        verticalAlignment = Alignment.CenterVertically // Center the children vertically
-    ) {
-        if (maskNumber) {
-            // Draw the first three groups of dots
-            repeat(3) {
-                BankCardDotGroup()
-            }
-        } else {
-            Text(
-                text = cardNumber.take(4),
-                style = TextStyle(
-                    fontFamily = LatoFont,
-                    fontWeight = FontWeight.Bold,
-                    fontSize = 20.sp,
-                    letterSpacing = 1.sp,
-                    color = Color.White
-                )
-            )
-            Text(
-                text = cardNumber.subSequence(4, 8).toString(),
-                style = TextStyle(
-                    fontFamily = LatoFont,
-                    fontWeight = FontWeight.Bold,
-                    fontSize = 20.sp,
-                    letterSpacing = 1.sp,
-                    color = Color.White
-                )
-            )
-            Text(
-                text = cardNumber.subSequence(8, 12).toString(),
-                style = TextStyle(
-                    fontFamily = LatoFont,
-                    fontWeight = FontWeight.Bold,
-                    fontSize = 20.sp,
-                    letterSpacing = 1.sp,
-                    color = Color.White
-                )
-            )
-        }
-
-        // Display the last four digits
-        Text(
-            text = cardNumber.takeLast(4),
-            style = TextStyle(
-                fontFamily = LatoFont,
-                fontWeight = FontWeight.Bold,
-                fontSize = 20.sp,
-                letterSpacing = 1.sp,
-                color = Color.White
-            )
-        )
-    }
-}
-
-@Composable
-fun BankCardDotGroup() {
-    Canvas(
-        modifier = Modifier.width(48.dp),
-        onDraw = { // You can adjust the width as needed
-            val dotRadius = 4.dp.toPx()
-            val spaceBetweenDots = 8.dp.toPx()
-            for (i in 0 until 4) { // Draw four dots
-                drawCircle(
-                    color = Color.White,
-                    radius = dotRadius,
-                    center = Offset(
-                        x = i * (dotRadius * 2 + spaceBetweenDots) + dotRadius,
-                        y = center.y
-                    )
-                )
-            }
-        })
-}
-
-@Composable
-fun BankCardLabelAndText(label: String, text: String) {
-    Column(
-        modifier = Modifier
-            .wrapContentSize(),
-        verticalArrangement = Arrangement.SpaceBetween
-    ) {
-        Text(
-            text = label.uppercase(),
-            style = TextStyle(
-                fontFamily = LatoFont,
-                fontWeight = FontWeight.W300,
-                fontSize = 12.sp,
-                letterSpacing = 1.sp,
-                color = Color.White
-            )
-        )
-        Spacer(modifier = Modifier.height(4.dp))
-        Text(
-            text = text,
-            style = TextStyle(
-                fontFamily = LatoFont,
-                fontWeight = FontWeight.W400,
-                fontSize = 16.sp,
-                letterSpacing = 1.sp,
-                color = Color.White
-            )
-        )
-    }
-}
-
-@Composable
-fun SpaceWrapper(
-    modifier: Modifier = Modifier,
-    space: Dp,
-    top: Boolean = false,
-    right: Boolean = false,
-    bottom: Boolean = false,
-    left: Boolean = false,
-    content: @Composable BoxScope.() -> Unit
-) {
-    Box(
-        contentAlignment = Alignment.Center,
-        modifier = modifier
-            .then(if (top) Modifier.padding(top = space) else Modifier)
-            .then(if (right) Modifier.padding(end = space) else Modifier)
-            .then(if (bottom) Modifier.padding(bottom = space) else Modifier)
-            .then(if (left) Modifier.padding(start = space) else Modifier)
-    ) {
-        content()
-    }
-}
-
 // Take a sneak peek with @Preview
 @Composable
 @Preview
@@ -297,11 +100,6 @@ fun BankCardUiPreview() {
         BankCardUi(
             modifier = Modifier.align(Alignment.Center),
             baseColor = Color(0xFFFF9800),
-            cardNumber = "1234567890123456",
-            cardHolder = "John Doe",
-            expires = "01/29",
-            cvv = "901",
-            brand = ""
         )
     }
 }

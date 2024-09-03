@@ -1,6 +1,7 @@
 package io.coinclave.crypto.applet.update.nfc.handlers
 
 import io.coinclave.crypto.applet.update.nfc.commands.BaseNFCExchangeAction
+import io.coinclave.crypto.applet.update.nfc.commands.CheckAppletVersionCommand
 import io.coinclave.crypto.applet.update.nfc.commands.EmptyNFCCommand
 import io.coinclave.crypto.applet.update.nfc.iso7816.CommandApdu
 
@@ -14,7 +15,7 @@ class EmptyNFCCommandHandler: NFCCommandHandler<EmptyNFCCommand> {
         return false
     }
 
-    override fun getAdditionalCommands(action: BaseNFCExchangeAction): List<BaseNFCExchangeAction>? {
+    override fun getAdditionalCommands(command: EmptyNFCCommand, action: BaseNFCExchangeAction): List<CommandApdu>? {
         throw RuntimeException("Get additional commands not implement for empty command handler")
     }
 

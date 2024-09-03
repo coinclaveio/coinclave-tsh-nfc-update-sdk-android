@@ -31,37 +31,49 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import io.coinclave.crypto.applet.update.dto.ActivateCardResult
+import io.coinclave.crypto.applet.update.network.models.CheckAppletVersionData
 
 class MainActivity : ComponentActivity() {
 
-    private val cardNumber = mutableStateOf("----------------")
-    private val cardHolder = mutableStateOf("")
-    private val cvv = mutableStateOf("---")
-    private val expiryDate = mutableStateOf("-/-")
-    private val brand = mutableStateOf("")
-    private val activateButtonEnabled = mutableStateOf(true)
+    private val checkUpdateAppletButtonEnabled = mutableStateOf(true)
 
     val updateAppletNfcService: UpdateAppletNfcService =
         UpdateAppletNfcServiceActivityImpl(R.layout.fragment_attach_card)
 
-    val nfcActivityResult =
+    val nfcCheckUpdateResult =
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result: ActivityResult? ->
             result?.let {
                 it.data?.let {
                     var result = it.getSerializableExtra(Intent.EXTRA_SUBJECT)
-                    if (result is ActivateCardResult) {
+                    if (result is CheckAppletVersionData) {
                         AlertDialog.Builder(this)
-                            .setMessage("Congratulations - your card is now activated!")
+                            .setMessage("New version of applet exists. Do you want to update?")
+                            .setPositiveButton("OK") {dialog, which -> startUpdateNfc(
+                                applicationContext,
+                                updateAppletNfcService,
+                                nfcUpdateResult,
+                                result
+                            )}
+                            .setNeutralButton("No") {dialog, which -> }
+                            .create().show()
+                        checkUpdateAppletButtonEnabled.value = true
+                    }
+                }
+            }
+        }
+
+    val nfcUpdateResult =
+        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result: ActivityResult? ->
+            result?.let {
+                it.data?.let {
+//                    var result = it.getSerializableExtra(Intent.EXTRA_SUBJECT)
+//                    if (result is CheckAppletVersionData) {
+                        AlertDialog.Builder(this)
+                            .setMessage("Applet is updated.")
                             .setPositiveButton("OK") {dialog, which -> }
                             .create().show()
-                        cardNumber.value = result.pan
-                        cardHolder.value = "John Doe"
-                        expiryDate.value = result.expiryDate
-                        cvv.value = "***"
-                        brand.value = "VISA"
-                        activateButtonEnabled.value = false
-                    }
+                        checkUpdateAppletButtonEnabled.value = true
+//                    }
                 }
             }
         }
@@ -85,12 +97,6 @@ class MainActivity : ComponentActivity() {
                 ) {
                     BankCardUi(
                         baseColor = Color(0xFFFF9800),
-                        cardNumber = cardNumber.value,
-                        cardHolder = cardHolder.value,
-                        expires = expiryDate.value,
-                        cvv = cvv.value,
-                        brand = brand.value,
-                        maskNumber = false
                     )
                     Box(
                         modifier = Modifier
@@ -100,12 +106,12 @@ class MainActivity : ComponentActivity() {
                     ) {
                         Button(
                             colors = ButtonDefaults.buttonColors(containerColor = Color.Blue),
-                            enabled = activateButtonEnabled.value,
+                            enabled = checkUpdateAppletButtonEnabled.value,
                             onClick = {
-                                startNfc(
+                                startCheckUpdateNfc(
                                     applicationContext,
                                     updateAppletNfcService,
-                                    nfcActivityResult
+                                    nfcCheckUpdateResult
                                 )
                             }) {
                             Text("Check update applet")
@@ -118,12 +124,21 @@ class MainActivity : ComponentActivity() {
 
 }
 
-fun startNfc(
+fun startCheckUpdateNfc(
+    context: Context,
+    updateAppletNfcService: UpdateAppletNfcService,
+    nfcLauncher: ActivityResultLauncher<Intent>
+) {
+    updateAppletNfcService.checkNeedAppletUpdate(context, nfcLauncher)
+}
+
+fun startUpdateNfc(
     context: Context,
     updateAppletNfcService: UpdateAppletNfcService,
     nfcLauncher: ActivityResultLauncher<Intent>,
+    updateData: CheckAppletVersionData
 ) {
-    updateAppletNfcService.checkNeedAppletUpdate(context, nfcLauncher);
+    updateAppletNfcService.updateApplet(context, nfcLauncher, updateData)
 }
 
 @Composable
@@ -144,12 +159,6 @@ fun MainActivityPreview() {
         ) {
             BankCardUi(
                 baseColor = Color(0xFFFF9800),
-                cardNumber = "123456789012345",
-                cardHolder = "John Doe",
-                expires = "12/34",
-                cvv = "123",
-                brand = "VISA",
-                maskNumber = true
             )
             Box(
                 modifier = Modifier

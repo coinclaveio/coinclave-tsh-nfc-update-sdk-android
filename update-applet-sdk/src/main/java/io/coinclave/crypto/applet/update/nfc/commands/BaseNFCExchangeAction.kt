@@ -15,7 +15,7 @@ open class BaseNFCExchangeAction(val action: Action): Serializable {
     }
 
     enum class Action {
-        EMPTY, INIT_CHECK_APPLET_VERSION, PROCESS_CHECK_APPLET_VERSION
+        EMPTY, INIT_CHECK_APPLET_VERSION, PROCESS_CHECK_APPLET_VERSION, INIT_UPDATE_APPLET_VERSION, PROCESS_UPDATE_APPLET_VERSION
     }
 
     fun putValueFromStep(command: CommandApdu, data: ByteArray) {

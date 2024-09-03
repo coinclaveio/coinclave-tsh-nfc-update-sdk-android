@@ -6,6 +6,7 @@ import io.coinclave.crypto.applet.update.nfc.commands.BaseNFCExchangeAction
 import io.coinclave.crypto.applet.update.nfc.iso7816.ResponseApdu
 import io.coinclave.crypto.applet.update.nfc.commands.aggregates.CheckAppletVersionCommandsAggregate
 import io.coinclave.crypto.applet.update.nfc.commands.aggregates.CommandAggregate
+import io.coinclave.crypto.applet.update.nfc.commands.aggregates.UpdateAppletCommandsAggregate
 import java.io.Serializable
 
 class AllAggregateHandlers {
@@ -37,5 +38,7 @@ class AllAggregateHandlers {
         handlers = HashMap()
         handlers[CheckAppletVersionCommandsAggregate::class.java] =
             CheckAppletVersionCommandsAggregateHandler()
+        handlers[UpdateAppletCommandsAggregate::class.java] =
+            UpdateAppletCommandsAggregateHandler()
     }
 }

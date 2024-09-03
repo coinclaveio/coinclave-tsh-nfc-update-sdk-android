@@ -15,12 +15,13 @@ package io.coinclave.crypto.applet.update.network.models;
 
 import com.google.gson.annotations.SerializedName;
 
+import java.io.Serializable;
 import java.util.Objects;
 
 /**
  * CheckAppletVersionResponse
  */
-public class CheckAppletVersionData {
+public class CheckAppletVersionData implements Serializable {
   @SerializedName("newVersion")
   private String newVersion;
 

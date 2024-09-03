@@ -14,7 +14,8 @@ public class NfcCommandHandlersStorage {
         handlers = Arrays.asList(
                 new StaticNFCCommandHandler(),
                 new EmptyNFCCommandHandler(),
-                new CheckAppletVersionCommandHandler()
+                new CheckAppletVersionCommandHandler(),
+                new UpdateAppletCommandHandler()
         );
     }
 

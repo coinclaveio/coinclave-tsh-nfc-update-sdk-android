@@ -8,21 +8,39 @@ import io.coinclave.crypto.applet.update.network.models.CheckAppletsVersionReque
 import io.coinclave.crypto.applet.update.network.models.StartCheckAppletsVersionRequest
 import io.coinclave.crypto.applet.update.nfc.commands.BaseNFCExchangeAction
 import io.coinclave.crypto.applet.update.nfc.commands.CheckAppletVersionCommand
-import io.coinclave.crypto.applet.update.nfc.commands.DynamicCommand
-import io.coinclave.crypto.applet.update.nfc.commands.StaticNFCCommand
 import io.coinclave.crypto.applet.update.nfc.iso7816.CommandApdu
 import java.util.Collections
 import java.util.concurrent.FutureTask
-import java.util.stream.Collectors
 
-private const val SESSION_ID = "sessionId"
+const val SESSION_ID = "sessionId"
 
 class CheckAppletVersionCommandHandler : BaseNFCCommandHandler<CheckAppletVersionCommand>() {
 
     private var appletApi: AppletApi = AppletApi()
 
-    override fun getAdditionalCommands(action: BaseNFCExchangeAction): List<BaseNFCExchangeAction>? {
-        throw RuntimeException("NFC request not created")
+    override fun getAdditionalCommands(command: CheckAppletVersionCommand, action: BaseNFCExchangeAction): List<CommandApdu>? {
+        val initCheckAppletVersionFuture = FutureTask {
+            val lastCommand = command.context.getLastRequest()
+            appletApi.processCheckAppletVersion(CheckAppletsVersionRequest()
+                .sessionId(command.context.getAbstractValue(SESSION_ID).toString())
+                .addCommandResponsesItem(APDUCommandResponse()
+                    .command(lastCommand.commandString)
+                    .response(StangeHexString.hexify(command.context.getValueFromStep(lastCommand)!!.responseBytes))
+                )
+            )
+        }
+        Thread(initCheckAppletVersionFuture).start()
+        val response = initCheckAppletVersionFuture.get() ?: throw ExchangeNfcException(
+            "Fail process check applet version exchange",
+            command,
+        )
+        if (response.apduCommands == null || response.apduCommands.isEmpty()) {
+            command.context.result = response.result
+            return null
+        }
+        return response.apduCommands
+            .map { StangeHexString.parseHexString(it.command) }
+            .map { CommandApdu(it) }
     }
 
     override fun getHandledClass(): Class<CheckAppletVersionCommand> {
@@ -48,7 +66,7 @@ class CheckAppletVersionCommandHandler : BaseNFCCommandHandler<CheckAppletVersio
             )
             command.context.putAbstractValue(SESSION_ID, response.sessionId)
             return response.apduCommands
-                .map { it.command.toByteArray(Charsets.UTF_8) }
+                .map { StangeHexString.parseHexString(it.command) }
                 .map { CommandApdu(it) }
         }
         if (action.action == BaseNFCExchangeAction.Action.PROCESS_CHECK_APPLET_VERSION) {
@@ -58,7 +76,7 @@ class CheckAppletVersionCommandHandler : BaseNFCCommandHandler<CheckAppletVersio
                     .sessionId(command.context.getAbstractValue(SESSION_ID).toString())
                     .addCommandResponsesItem(APDUCommandResponse()
                         .command(lastCommand.commandString)
-                        .response(StangeHexString.hexify(command.context.getValueFromStep(lastCommand)!!.responseData))
+                        .response(StangeHexString.hexify(command.context.getValueFromStep(lastCommand)!!.responseBytes))
                     )
                 )
             }
@@ -68,7 +86,7 @@ class CheckAppletVersionCommandHandler : BaseNFCCommandHandler<CheckAppletVersio
                 command,
             )
             return response.apduCommands
-                .map { it.command.toByteArray(Charsets.UTF_8) }
+                .map { StangeHexString.parseHexString(it.command) }
                 .map { CommandApdu(it) }
         }
         return Collections.emptyList()

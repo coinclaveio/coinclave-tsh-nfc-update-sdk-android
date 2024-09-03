@@ -1,12 +1,13 @@
 package io.coinclave.crypto.applet.update.nfc.handlers
 
 import io.coinclave.crypto.applet.update.nfc.commands.BaseNFCExchangeAction
+import io.coinclave.crypto.applet.update.nfc.commands.CheckAppletVersionCommand
 import io.coinclave.crypto.applet.update.nfc.commands.StaticNFCCommand
 import io.coinclave.crypto.applet.update.nfc.iso7816.CommandApdu
 
 class StaticNFCCommandHandler : BaseNFCCommandHandler<StaticNFCCommand>() {
 
-    override fun getAdditionalCommands(action: BaseNFCExchangeAction): List<BaseNFCExchangeAction>? {
+    override fun getAdditionalCommands(command: StaticNFCCommand, action: BaseNFCExchangeAction): List<CommandApdu>? {
         throw RuntimeException("NFC request not created")
     }
 
