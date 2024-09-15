@@ -5,7 +5,6 @@ import io.coinclave.crypto.applet.update.dto.BlankResult
 import io.coinclave.crypto.applet.update.exceptions.ExchangeNfcException
 import io.coinclave.crypto.applet.update.network.client.CardApi
 import io.coinclave.crypto.applet.update.network.models.APDUCommandResponse
-import io.coinclave.crypto.applet.update.network.models.CheckAppletsVersionRequest
 import io.coinclave.crypto.applet.update.network.models.UpdateCardProgressRequest
 import io.coinclave.crypto.applet.update.network.models.UpdateCardRequest
 import io.coinclave.crypto.applet.update.nfc.commands.BaseNFCExchangeAction
@@ -22,7 +21,7 @@ class UpdateAppletCommandHandler : BaseNFCCommandHandler<UpdateAppletCommand>() 
     private var cardApi: CardApi = CardApi()
 
     override fun getAdditionalCommands(command: UpdateAppletCommand, action: BaseNFCExchangeAction): List<CommandApdu>? {
-        val initCheckAppletVersionFuture = FutureTask {
+        val patchUpdateFuture = FutureTask {
             val lastCommand = command.context.getLastRequest()
             cardApi.patchUpdateCard(
                 UpdateCardProgressRequest()
@@ -40,8 +39,8 @@ class UpdateAppletCommandHandler : BaseNFCCommandHandler<UpdateAppletCommand>() 
                     )
             )
         }
-        Thread(initCheckAppletVersionFuture).start()
-        val response = initCheckAppletVersionFuture.get() ?: throw ExchangeNfcException(
+        Thread(patchUpdateFuture).start()
+        val response = patchUpdateFuture.get() ?: throw ExchangeNfcException(
             "Fail process check applet version exchange",
             command,
         )

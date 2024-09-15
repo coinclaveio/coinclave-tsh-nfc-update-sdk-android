@@ -39,13 +39,14 @@ public abstract class BaseNFCCommandHandler<I extends AbstractNFCCommand> implem
                     if (needGetAdditionalCommands(action)) {
                         var additionalCommands = getAdditionalCommands(command, action);
                         while(additionalCommands != null && !additionalCommands.isEmpty()) {
-                            for (var request : action.getRequests()) {
+                            for (var request : additionalCommands) {
                                 ResponseApdu intermediateResult = listener.send(request);
                                 if (intermediateResult != null) {
                                     command.getContext().putValueFromStep(request, intermediateResult);
                                     action.putValueFromStep(request, intermediateResult.getResponseBytes());
                                 }
                             }
+                            additionalCommands = getAdditionalCommands(command, action);
                         }
                     }
                 }

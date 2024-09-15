@@ -16,9 +16,6 @@ android {
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
 
         buildConfigField "String", "DATA_SERVICE_URL", "\"https://gateway.coinclave.io\""
-        buildConfigField "String", "AUTH_SERVICE_URL", "\"https://auth.coinclave.io\""
-        buildConfigField "String", "AUTH_LOGIN", "\"abcorp-api-client\""
-        buildConfigField "String", "AUTH_PASSWORD", "\"5Yo0QH4pNxH8qF11S2aTrlb9mWG6M8rh\""
     }
 
     buildTypes {

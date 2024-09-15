@@ -13,11 +13,8 @@
 
 package io.coinclave.crypto.applet.update.network.invoker;
 
-import io.coinclave.crypto.applet.update.BuildConfig;
-
 public class Configuration {
     private static ApiClient defaultApiClient = new ApiClient();
-    private static ApiClient authApiClient = new ApiClient(BuildConfig.AUTH_SERVICE_URL);
 
     /**
      * Get the default API client, which would be used when creating API
@@ -27,10 +24,6 @@ public class Configuration {
      */
     public static ApiClient getDefaultApiClient() {
         return defaultApiClient;
-    }
-
-    public static ApiClient getAuthApiClient() {
-        return authApiClient;
     }
 
     /**

@@ -31,6 +31,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import io.coinclave.crypto.applet.update.dto.BlankResult
 import io.coinclave.crypto.applet.update.network.models.CheckAppletVersionData
 
 class MainActivity : ComponentActivity() {
@@ -46,16 +47,30 @@ class MainActivity : ComponentActivity() {
                 it.data?.let {
                     var result = it.getSerializableExtra(Intent.EXTRA_SUBJECT)
                     if (result is CheckAppletVersionData) {
-                        AlertDialog.Builder(this)
-                            .setMessage("New version of applet exists. Do you want to update?")
-                            .setPositiveButton("OK") {dialog, which -> startUpdateNfc(
-                                applicationContext,
-                                updateAppletNfcService,
-                                nfcUpdateResult,
-                                result
-                            )}
-                            .setNeutralButton("No") {dialog, which -> }
-                            .create().show()
+                        val message =
+                            if (result.needUpdate) ("New version of applet exists. \nYou version "
+                                    + result.oldVersion
+                                    + ". \nNew version "
+                                    + result.newVersion
+                                    + ". \nDo you want to update?")
+                            else ("You have actual version applet: " + result.oldVersion)
+                        val dialogBuilder = AlertDialog.Builder(this)
+                            .setMessage(
+                                message
+                            )
+                        dialogBuilder
+                            .setPositiveButton("OK") { dialog, which ->
+                                if (result.needUpdate)
+                                    startUpdateNfc(
+                                        applicationContext,
+                                        updateAppletNfcService,
+                                        nfcUpdateResult,
+                                        result
+                                    )
+                            }
+                        if (result.needUpdate)
+                            dialogBuilder.setNeutralButton("No") { dialog, which -> }
+                        dialogBuilder.create().show()
                         checkUpdateAppletButtonEnabled.value = true
                     }
                 }
@@ -66,14 +81,14 @@ class MainActivity : ComponentActivity() {
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result: ActivityResult? ->
             result?.let {
                 it.data?.let {
-//                    var result = it.getSerializableExtra(Intent.EXTRA_SUBJECT)
-//                    if (result is CheckAppletVersionData) {
+                    var result = it.getSerializableExtra(Intent.EXTRA_SUBJECT)
+                    if (result is BlankResult) {
                         AlertDialog.Builder(this)
                             .setMessage("Applet is updated.")
-                            .setPositiveButton("OK") {dialog, which -> }
+                            .setPositiveButton("OK") { dialog, which -> }
                             .create().show()
                         checkUpdateAppletButtonEnabled.value = true
-//                    }
+                    }
                 }
             }
         }
